@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Application</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src = "web3.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+<script type="text/javascript" src = "web3.js"></script>
+
+</head>
+<body style="background: #eaebef;">
+    <div class="row" align="center" style="margin-top: 20vh">
+        Баланс фонда (ETH): <div id="balanceEther"></div><br>
+        Количество выпущенных токенов: <div id="balanceToken"></div><br>
+        
+        <input type = "text" id = "address1" style="width: 200px"><br>
+        <div class="waves-effect waves-light btn approve" style="cursor: pointer; background-color: #64c6e1;">
+            Разрашеить инвестору забрать токены
+        </div><br>
+        <input type = "text" id = "address2" style="width: 200px"><br>
+        <div class="waves-effect waves-light btn nonApprove" style="cursor: pointer; background-color: #64c6e1;">
+            Запретить инвестору забрать токены
+        </div><br><br>
+        <div class="waves-effect waves-light btn showlist" style="cursor: pointer; background-color: #64c6e1;">
+            Показать список
+        </div><br>
+        Список инвесторов: <div id="listInvestors"></div><br>
+    </div>
+<script>
+    let Web3 = require('web3');
+        if (typeof web3 !== 'undefined'){
+            web3 = new Web3(web3.currentProvider);
+        }
+        else {
+            alert('You have to install MetaMask !');
+        }
+
+
+
+    const tokenAbi = [{"constant":true,"inputs":[],"name":"mintingFinished","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"coin","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"mint","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"contr","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_address","type":"address"}],"name":"setContract","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"finishMinting","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_address","type":"address"},{"name":"_value","type":"uint256"}],"name":"burn","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"burner","type":"address"},{"indexed":true,"name":"value","type":"uint256"}],"name":"Burn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[],"name":"MintFinished","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}];
+    const contractAbi = [{"constant":true,"inputs":[],"name":"getlengthListInvestors","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_value","type":"uint256"}],"name":"refund","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"balances","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"rate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"whiteList","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"investors","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_index","type":"uint256"}],"name":"getListInvestor","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"contr","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_address","type":"address"}],"name":"setContract","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_address","type":"address"},{"name":"_bool","type":"bool"}],"name":"setWhiteList","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_wallet","type":"address"}],"name":"changeWalletFund","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"walletFund","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_address","type":"address"}],"name":"getWhiteList","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"createTokens","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"token","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_token","type":"address"},{"name":"_name","type":"string"},{"name":"_wallet","type":"address"},{"name":"_rate","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"}];
+
+    const tokenAdress = "0xb040df69b3866d797f277e3508433a2b354e2643";
+    var myToken = web3.eth.contract(tokenAbi);
+    var myTokenInstance = myToken.at(tokenAdress);
+    const contractAdress = "0x8b6e470ea22e571f4a6c6b60594ad9cea206b6c4";
+    var MyContract = web3.eth.contract(contractAbi);
+    var MyContractInstrance = MyContract.at(contractAdress);
+    var list= "", length, address, wallet;
+
+    $(document).ready(function(){
+
+        MyContractInstrance.walletFund.call(function(err, res){
+            wallet= res.toString();
+            getBalance(wallet) ;
+        });
+
+        
+
+        function getBalance(address) {
+            if (address.length <= 3) {
+                alert("Wallet address is incorrect") ;
+                return 0 ;
+            }
+
+            web3.eth.getBalance(address, function(error, result){
+                console.log('yes') ;
+                if(!error) {
+                    balance = result.toString(10) ;
+                    setBalance(balance) ;
+                } else {
+                    alert('Some error happens. Please, try again.') ;
+                    console.error(error);
+                }
+            });
+        }
+
+        function setBalance(wei) {
+            var eth = web3.fromWei(wei, 'ether') ;
+            $('#balanceEther').html(eth) ;
+        }
+
+        myTokenInstance.totalSupply.call(function(err, res){
+            console.log(res.toNumber());
+            $("#balanceToken").html(web3.fromWei(res.toNumber()));
+        });
+
+        MyContractInstrance.getWhiteList.call(web3.eth.accounts[0],function(err, res){
+            console.log(res.toString());
+            $("#ableRefund").html(res.toString());
+        });
+
+        MyContractInstrance.getlengthListInvestors.call(function(err, res){
+            console.log(res.toNumber());
+            length = res.toNumber();
+        });
+        
+        
+        
+    });
+    
+    
+    $(".approve").click(function(){
+        address = $("#address1").val();
+        let functionApprove = MyContractInstrance.setWhiteList.getData($("#address1").val(), true);
+        web3.eth.sendTransaction({
+                to: contractAdress,
+                from: web3.eth.accounts[0],
+                data: functionApprove
+            },
+            function(error){
+                console.log(error);
+            }
+        );
+    });
+
+    $(".nonApprove").click(function(){
+    address = $("#address2").val();
+    let functionNonApprove = MyContractInstrance.setWhiteList.getData(address, false);
+        web3.eth.sendTransaction({
+                to: contractAdress,
+                from: web3.eth.accounts[0],
+                data: functionNonApprove
+            },
+            function(error){
+                console.log(error);
+            }
+        );
+    });
+    $(".showlist").click(function(){
+        for(var i =0; i<length; i++){    
+            MyContractInstrance.investors.call(i, function(err, res){
+                list += res.toString() + " <br>";
+                 $("#listInvestors").html(list); 
+            });
+        }       
+    });
+
+// list += res.toString() + " ";
+                
+//                 list += " депозит: " + res.toNumber()/1000000000000000000 + " ETH <br>"; 
+//                       $("#listInvestors").html(list);
+</script>
+<!-- <script src="js/common.js"></script>
+<script src="js/web3.min.js"></script>
+<script src="js/hooked-web3-provider.js"></script>
+<script src="js/ethereumjs-accounts.js"></script>
+<script src="js/create-contract.js"></script> -->
+</body>
+</html>
