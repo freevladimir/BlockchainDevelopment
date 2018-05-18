@@ -337,11 +337,6 @@ contract Crowdsale is Ownable {
         _;
     }
     
-    modifier isUnderHardCap() {
-        require(this.balance <= hardcap);
-        _;
-    }
-    
     function getListInvestor(uint _index) view returns(address){
         return investors[_index];
     }
